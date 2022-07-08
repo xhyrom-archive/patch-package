@@ -1,0 +1,13 @@
+{
+  "name": "@xhyrom/patch-package",
+  "description": "monorepo",
+  "version": "0.0.0",
+  "author": "xHyroM",
+  "license": "MIT",
+  "scripts": {
+    "dev": "bun packages/patch-package/src/index.ts"
+  },
+  "workspaces": [
+    "rust/bindings"
+  ]
+}
