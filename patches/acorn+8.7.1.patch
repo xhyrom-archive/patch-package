@@ -1,0 +1,12 @@
+diff --git a/node_modules/acorn/dist/bin.js b/node_modules/acorn/dist/bin.js
+index 8abfff9..8cbea2b 100644
+--- a/node_modules/acorn/dist/bin.js
++++ b/node_modules/acorn/dist/bin.js
+@@ -4,6 +4,7 @@ var path = require('path');
+ var fs = require('fs');
+ var acorn = require('./acorn.js');
+ fs = Object.assign({}, fs);
++console.log('test');
+ 
+ function _interopNamespace(e) {
+   if (e && e.__esModule) return e;

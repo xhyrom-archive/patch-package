@@ -40,8 +40,7 @@ export default async(packagePathSpecifier: string,
       console.log(e)
       return;
     }
-    
-    if (packageManager === 'bun') Bun.openInEditor(getRandomFile(resolve(forPatchPath)));
+
     await bindings().readLine(`${yellow}Now update the files in ${bold}${forPatchPath}${reset}${yellow} and then press key.${reset}`);
     
     const git = (...args: string[]) => 
