@@ -1,6 +1,7 @@
 {
   "name": "@xhyrom/patch-package",
   "version": "0.0.0",
+  "private": true,
   "author": "xHyroM",
   "description": "monorepo",
   "license": "MIT",
