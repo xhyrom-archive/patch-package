@@ -1,17 +1,21 @@
 {
   "name": "@xhyrom/patch-package",
   "version": "0.1.0",
-  "description": "",
+  "author": "",
   "main": "dist/index.js",
+  "devDependencies": {
+    "@types/diff": "^5.0.2",
+    "@types/node": "^18.0.3",
+    "bun-types": "^0.1.2"
+  },
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
   "scripts": {
     "dev": "bun src/index.ts",
     "build": "bun bun src/"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/node": "^18.0.3",
-    "bun-types": "^0.1.2"
+  "dependencies": {
+    "diff": "^5.1.0"
   }
 }

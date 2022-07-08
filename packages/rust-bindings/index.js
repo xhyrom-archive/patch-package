@@ -236,6 +236,8 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { runCommand } = nativeBinding
+const { runCommand, removeDirectory, readLine } = nativeBinding
 
 module.exports.runCommand = runCommand
+module.exports.removeDirectory = removeDirectory
+module.exports.readLine = readLine
