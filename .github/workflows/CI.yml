@@ -86,7 +86,7 @@ jobs:
         working-directory: ./packages/rust-bindings
         shell: bash
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
         working-directory: ./packages/rust-bindings
       - name: Setup node x86
         uses: actions/setup-node@v3
@@ -145,7 +145,7 @@ jobs:
           path: .yarn/cache
           key: npm-cache-test-${{ matrix.settings.target }}-${{ matrix.node }}-${{ hashFiles('yarn.lock') }}
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
         working-directory: ./packages/rust-bindings
       - name: Download artifacts
         uses: actions/download-artifact@v3
@@ -186,7 +186,7 @@ jobs:
           path: .yarn/cache
           key: npm-cache-test-linux-x64-gnu-${{ matrix.node }}
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
         working-directory: ./packages/rust-bindings
       - name: Download artifacts
         uses: actions/download-artifact@v3
@@ -221,7 +221,7 @@ jobs:
           path: .yarn/cache
           key: npm-cache-ubuntu-latest-publish
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable
         working-directory: ./packages/rust-bindings
       - name: Download all artifacts
         uses: actions/download-artifact@v3
