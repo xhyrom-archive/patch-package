@@ -90,7 +90,6 @@ jobs:
       - name: Setup node x86
         uses: actions/setup-node@v3
         if: matrix.settings.target == 'i686-pc-windows-msvc'
-        working-directory: ./packages/rust-bindings
         with:
           node-version: 16
           check-latest: true
@@ -99,7 +98,6 @@ jobs:
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
-        working-directory: ./packages/rust-bindings
         with:
           image: ${{ matrix.settings.docker }}
           options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/root/.cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/root/.cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/root/.cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
@@ -111,7 +109,6 @@ jobs:
         shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v3
-        working-directory: ./packages/rust-bindings
         with:
           name: bindings-${{ matrix.settings.target }}
           path: ${{ env.APP_NAME }}.*.node
