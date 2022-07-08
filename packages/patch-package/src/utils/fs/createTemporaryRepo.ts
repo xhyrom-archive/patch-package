@@ -2,6 +2,7 @@ import { chmodSync, mkdirSync, writeFileSync } from "fs"
 import { join, resolve } from "path"
 import getPackageVersion from "../package/getPackageVersion"
 import { PackageDetails } from "../package/packageDetails"
+import parseFlag from "../parseFlag"
 import { randomString } from "../random/randomString"
 
 export default (packageDetails: PackageDetails): {

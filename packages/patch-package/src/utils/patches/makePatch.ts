@@ -13,6 +13,7 @@ import installOriginal from '../package/installOriginal';
 import getPatchFiles from '../fs/getPatchFiles';
 import { bold, green, red, reset, yellow } from '../colors';
 import getRandomFile from '../fs/getRandomFile';
+import parseFlag from '../parseFlag';
 
 export default async(packagePathSpecifier: string,
   applicationPath: string,
@@ -72,7 +73,7 @@ export default async(packagePathSpecifier: string,
       "--no-color",
       "--ignore-space-at-eol",
       "--no-ext-diff",
-    ))?.replaceAll('-for-patch', '')
+    ))?.replaceAll('-for-patch', '');
 
     removeDirectory(packageManager, resolve(forPatchPath));
     removeDirectory(packageManager, tmpRepo.tmpRepoNpmRoot);
