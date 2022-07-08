@@ -45,7 +45,6 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         if: ${{ !matrix.settings.docker }}
-        working-directory: ./packages/rust-bindings
         with:
           node-version: 16
           check-latest: true
@@ -53,7 +52,6 @@ jobs:
       - name: Install
         uses: actions-rs/toolchain@v1
         if: ${{ !matrix.settings.docker }}
-        working-directory: ./packages/rust-bindings
         with:
           profile: minimal
           override: true
@@ -61,7 +59,6 @@ jobs:
           target: ${{ matrix.settings.target }}
       - name: Cache cargo
         uses: actions/cache@v3
-        working-directory: ./packages/rust-bindings
         with:
           path: |
             ~/.cargo/registry/index/
@@ -74,7 +71,6 @@ jobs:
           key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
       - name: Cache NPM dependencies
         uses: actions/cache@v3
-        working-directory: ./packages/rust-bindings
         with:
           path: .yarn/cache
           key: npm-cache-build-${{ matrix.settings.target }}-node@16
@@ -139,14 +135,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
-        working-directory: ./packages/rust-bindings
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
           cache: yarn
       - name: Cache NPM dependencies
         uses: actions/cache@v3
-        working-directory: ./packages/rust-bindings
         with:
           path: .yarn/cache
           key: npm-cache-test-${{ matrix.settings.target }}-${{ matrix.node }}-${{ hashFiles('yarn.lock') }}
@@ -182,14 +176,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
-        working-directory: ./packages/rust-bindings
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
           cache: yarn
       - name: Cache NPM dependencies
         uses: actions/cache@v3
-        working-directory: ./packages/rust-bindings
         with:
           path: .yarn/cache
           key: npm-cache-test-linux-x64-gnu-${{ matrix.node }}
@@ -219,14 +211,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
-        working-directory: ./packages/rust-bindings
         with:
           node-version: 16
           check-latest: true
           cache: yarn
       - name: Cache NPM dependencies
         uses: actions/cache@v3
-        working-directory: ./packages/rust-bindings
         with:
           path: .yarn/cache
           key: npm-cache-ubuntu-latest-publish
