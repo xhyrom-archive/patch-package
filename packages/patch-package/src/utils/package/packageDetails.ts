@@ -17,9 +17,9 @@ export interface PatchedPackageDetails extends PackageDetails {
     isDevOnly: boolean;
 }
 
-export function getPatchDetailsFromCliString(
+export const getPatchDetailsFromCliString =(
     specifier: string,
-  ): PackageDetails | null {
+  ): PackageDetails | null => {
     const parts = specifier.split('/')
   
     const packageNames = []

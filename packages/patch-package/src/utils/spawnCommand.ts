@@ -3,7 +3,7 @@ import loadBinding from './loadBinding';
 
 let nativeBinding = null;
 
-export const bindings = () => {
+const bindings = () => {
     if (nativeBinding) return nativeBinding;
     const { platform, arch } = process;
     

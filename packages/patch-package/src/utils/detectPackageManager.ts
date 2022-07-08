@@ -29,6 +29,6 @@ export default (applicationPath): PackageManagers => {
     } else if (pnpmLockExists) {
         return 'pnpm'
     } else {
-        return 'npm';
+        return process.argv[0] as PackageManagers;
     }
 }
