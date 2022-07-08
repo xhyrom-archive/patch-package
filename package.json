@@ -8,6 +8,8 @@
     "dev": "bun packages/patch-package/src/index.ts"
   },
   "workspaces": [
-    "rust/bindings"
-  ]
+    "packages/rust-bindings",
+    "packages/patch-package"
+  ],
+  "repository": "https://github.com/xHyroM/patch-package.git"
 }
