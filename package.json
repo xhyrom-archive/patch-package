@@ -9,8 +9,5 @@
   },
   "workspaces": [
     "rust/bindings"
-  ],
-  "dependencies": {
-    "acorn": "^8.7.1"
-  }
+  ]
 }
