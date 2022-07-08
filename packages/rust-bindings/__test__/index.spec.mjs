@@ -1,7 +1,7 @@
 import test from 'ava'
 
-import { sum } from '../index.js'
+import { runCommand } from '../index.js'
 
-test('sum from native', (t) => {
-  t.is(sum(1, 2), 3)
+test('run_command from native', (t) => {
+  t.is(runCommand('echo', process.cwd(), ['test']), 'test\n');
 })
