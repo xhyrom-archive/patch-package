@@ -146,7 +146,6 @@ jobs:
         working-directory: ./packages/rust-bindings
       - name: Download artifacts
         uses: actions/download-artifact@v3
-        working-directory: ./packages/rust-bindings
         with:
           name: bindings-${{ matrix.settings.target }}
           path: .
@@ -187,7 +186,6 @@ jobs:
         working-directory: ./packages/rust-bindings
       - name: Download artifacts
         uses: actions/download-artifact@v3
-        working-directory: ./packages/rust-bindings
         with:
           name: bindings-x86_64-unknown-linux-gnu
           path: .
@@ -222,7 +220,6 @@ jobs:
         working-directory: ./packages/rust-bindings
       - name: Download all artifacts
         uses: actions/download-artifact@v3
-        working-directory: ./packages/rust-bindings
         with:
           path: artifacts
       - name: Move artifacts
