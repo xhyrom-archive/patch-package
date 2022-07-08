@@ -1,6 +1,6 @@
 // From: https://github.com/ds300/patch-package/blob/master/src/makePatch.ts
 
-import { existsSync, mkdirSync, realpathSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, realpathSync, unlinkSync, writeFileSync } from 'fs';
 import { dirname, join, resolve } from 'path';
 import bindings from '../bindings';
 import { PackageManagers } from '../detectPackageManager';
@@ -10,6 +10,9 @@ import { getPatchDetailsFromCliString, PackageDetails } from '../package/package
 import spawnCommand from '../spawnCommand';
 import createTemporaryRepo from '../fs/createTemporaryRepo';
 import installOriginal from '../package/installOriginal';
+import getPatchFiles from '../fs/getPatchFiles';
+import { bold, green, red, reset, yellow } from '../colors';
+import getRandomFile from '../fs/getRandomFile';
 
 export default async(packagePathSpecifier: string,
   applicationPath: string,
@@ -25,11 +28,9 @@ export default async(packagePathSpecifier: string,
       return
     }
 
-    const appPackageJson = require(join(applicationPath, "package.json"))
     const packagePath = join(applicationPath, packageDetails.path)
-    const packageJsonPath = join(packagePath, "package.json")
-
     const tmpRepo = createTemporaryRepo(packageDetails);
+    const forPatchPath = `node_modules/${packageDetails.name}-for-patch`;
 
     await installOriginal(packageManager, packageDetails, tmpRepo.packageVersion, tmpRepo.tmpRepoNpmRoot);
     
@@ -40,8 +41,8 @@ export default async(packagePathSpecifier: string,
       return;
     }
     
-    await bindings().readLine(`Now, update files in node_modules/${packageDetails.name}-for-patch and after that click some key`);
-
+    if (packageManager === 'bun') Bun.openInEditor(getRandomFile(resolve(forPatchPath)));
+    await bindings().readLine(`${yellow}Now update the files in ${bold}${forPatchPath}${reset}${yellow} and then press key.${reset}`);
     
     const git = (...args: string[]) => 
       spawnCommand(packageManager, 'git', args, {
@@ -49,6 +50,9 @@ export default async(packagePathSpecifier: string,
       });
     
     // TODO: remove ignored files (tmpRepo.tmpRepoName, includePaths, excludePaths) // ON THIS LINE
+
+    git("add", "-f", packageDetails.path)
+    git("commit", "--allow-empty", "-m", "init")
 
     removeDirectory(packageManager, tmpRepo.tmpRepoPackagePath);
 
@@ -59,24 +63,33 @@ export default async(packagePathSpecifier: string,
 
     // TODO: remove ignored files (tmpRepo.tmpRepoName, includePaths, excludePaths) // ON THIS LINE
 
-    const diffResult = await git(
-      "diff",
-      "--no-index",
-      resolve(tmpRepo.tmpRepoPackagePath),
-      resolve(packagePath + '-for-patch'),
-    );
+    // stage all files
+    git("add", "-f", packagePath + '-for-patch')
 
-    removeDirectory(packageManager, resolve(packagePath + '-for-patch'));
+    // get diff of changes
+    const diffResult = (await git(
+      "diff",
+      "--cached",
+      "--no-color",
+      "--ignore-space-at-eol",
+      "--no-ext-diff",
+    ))?.replaceAll('-for-patch', '')
+
+    removeDirectory(packageManager, resolve(forPatchPath));
     removeDirectory(packageManager, tmpRepo.tmpRepoNpmRoot);
 
     if (diffResult.length === 0) {
       console.warn(
-        `⁉️  Not creating patch file for package '${packagePathSpecifier}'`,
+        `${red}⁉️  Not creating patch file for package '${packagePathSpecifier}'${reset}`,
       );
-      console.warn(`⁉️  There don't appear to be any changes.`);
+      console.warn(`${red}⁉️  There don't appear to be any changes.${reset}`);
       process.exit(1);
       return;
     }
+
+    for (const patchFile of getPatchFiles(patchesDir)) {
+      unlinkSync(`${patchesDir}/${patchFile}`);
+    };
 
     const patchFileName = createPatchFileName({
       packageDetails,
@@ -88,7 +101,7 @@ export default async(packagePathSpecifier: string,
 
     writeFileSync(patchPath, diffResult);
     console.log(
-      `Created patch in ${join(patchesDir, patchFileName)}\n`,
+      `${green}🚀 Created patch in ${join(patchesDir, patchFileName)}${reset}\n`,
     )
 }
 
