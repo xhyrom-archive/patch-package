@@ -1,11 +1,13 @@
-import { join, resolve } from "path";
-import { bold, green, red, reset } from "../colors";
-import { PackageManagers } from "../detectPackageManager";
-import getPatchFiles from "../fs/getPatchFiles";
-import { getPackageDetailsFromPatchFilename, PackageDetails } from "../package/packageDetails";
-import { executeEffects } from "./impl/apply";
-import { readPatch } from "./impl/read";
-import { reversePatch } from "./impl/reverse";
+import { join, resolve } from 'path';
+import { bold, green, red, reset } from '../colors';
+import { PackageManagers } from '../detectPackageManager';
+import getPatchFiles from '../fs/getPatchFiles';
+import removeDirectory from '../fs/removeDirectory';
+import getUserHome from '../getUserHome';
+import { getPackageDetailsFromPatchFilename, PackageDetails } from '../package/packageDetails';
+import { executeEffects } from './impl/apply';
+import { readPatch } from './impl/read';
+import { reversePatch } from './impl/reverse';
 
 export default async(packageManager: PackageManagers,
     patchesDir: string,
@@ -36,8 +38,9 @@ export default async(packageManager: PackageManagers,
             pathSpecifier,
         } = packageDetails;
     
-        const packageDir = join(applicationPath, path)
-        const installedPackage = require(join(packageDir, "package.json"))
+        const packageDir = join(applicationPath, path);
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const installedPackage = require(join(packageDir, 'package.json'));
 
         if (
             applyPatch({
@@ -49,18 +52,20 @@ export default async(packageManager: PackageManagers,
         ) {
           console.log(
             `${bold}${pathSpecifier}@${version} ${green}✔${reset}`,
-          )
+          );
+
+          if (packageManager === 'bun') await removeDirectory(packageManager, resolve(`${getUserHome()}/.bun/install/cache/${packageDetails.name}@${version}/`));
         } else if (installedPackage.version === version) {
           errors.push(
             `${red}Failed to apply patch because package version?.`
-          )
+          );
         } else {
           errors.push(
             `${red}Failed to apply patch.`
-          )
+          );
         }
     }
-}
+};
 
 export function applyPatch({
     patchFilePath,
@@ -75,15 +80,15 @@ export function applyPatch({
   }): boolean {
     const patch = readPatch({ patchFilePath, packageDetails, patchDir });
     try {
-      executeEffects(reverse ? reversePatch(patch) : patch, { dryRun: false })
+      executeEffects(reverse ? reversePatch(patch) : patch, { dryRun: false });
     } catch (e) {
       console.log(e);
       try {
-        executeEffects(reverse ? patch : reversePatch(patch), { dryRun: true })
+        executeEffects(reverse ? patch : reversePatch(patch), { dryRun: true });
       } catch (e) {
-        return false
+        return false;
       }
     }
   
-    return true
+    return true;
 }

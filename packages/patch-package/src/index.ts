@@ -4,7 +4,6 @@ import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import makeRegex from './utils/makeRegex';
 import detectPackageManager from './utils/detectPackageManager';
-import spawnCommand from './utils/spawnCommand';
 import makePatch from './utils/patches/makePatch';
 import applyPatches from './utils/patches/applyPatches';
 const argv = process.argv.slice(2);
@@ -25,13 +24,13 @@ if (parseFlag('help')) {
             'include',
             /.*/,
             Boolean(parseFlag('case_sensitive_path_filtering')),
-        )
+        );
         const excludePaths = makeRegex(
             parseFlag('exclude') || '',
             'exclude',
             /package\.json$/,
             Boolean(parseFlag('case_sensitive_path_filtering')),
-        )
+        );
         
         for (const packageName of packageNames) {
             /*spawnCommand(packageManager, 'git', ['--version'], {

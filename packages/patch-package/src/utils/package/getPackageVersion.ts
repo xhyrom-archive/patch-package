@@ -1,3 +1,4 @@
 export default (packageJsonPath: string): string => {
-    return require(packageJsonPath).version.replace(/\+.*$/, "")
-}
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require(packageJsonPath).version.replace(/\+.*$/, '');
+};

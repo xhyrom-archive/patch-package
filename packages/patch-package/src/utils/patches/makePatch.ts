@@ -11,9 +11,8 @@ import spawnCommand from '../spawnCommand';
 import createTemporaryRepo from '../fs/createTemporaryRepo';
 import installOriginal from '../package/installOriginal';
 import getPatchFiles from '../fs/getPatchFiles';
-import { bold, green, red, reset, yellow } from '../colors';
-import getRandomFile from '../fs/getRandomFile';
-import parseFlag from '../parseFlag';
+import { green, red, reset } from '../colors';
+import getUserHome from '../getUserHome';
 
 export default async(packagePathSpecifier: string,
   applicationPath: string,
@@ -22,61 +21,63 @@ export default async(packagePathSpecifier: string,
   excludePaths: RegExp,
   patchesDir: string
 ) => {
-    const packageDetails = getPatchDetailsFromCliString(packagePathSpecifier)
+    const packageDetails = getPatchDetailsFromCliString(packagePathSpecifier);
 
     if (!packageDetails) {
-      console.error('No such package', packagePathSpecifier)
-      return
-    }
-
-    const packagePath = join(applicationPath, packageDetails.path)
-    const tmpRepo = createTemporaryRepo(packageDetails);
-    const forPatchPath = `node_modules/${packageDetails.name}-for-patch`;
-
-    await installOriginal(packageManager, packageDetails, tmpRepo.packageVersion, tmpRepo.tmpRepoNpmRoot);
-    
-    try {
-      await copyDirectory(realpathSync(packagePath), resolve(packagePath + '-for-patch'));
-    } catch(e) {
-      console.log(e)
+      console.error('No such package', packagePathSpecifier);
       return;
     }
 
-    await bindings().readLine(`${yellow}Now update the files in ${bold}${forPatchPath}${reset}${yellow} and then press key.${reset}`);
+    const packagePath = join(applicationPath, packageDetails.path);
+    const tmpRepo = createTemporaryRepo(packageDetails);
+
+    if (packageManager === 'bun') await removeDirectory(packageManager, resolve(`${getUserHome()}/.bun/install/cache/${packageDetails.name}@${tmpRepo.packageVersion}/`));
+    await installOriginal(packageManager, packageDetails, tmpRepo.packageVersion, tmpRepo.tmpRepoNpmRoot);
+    await bindings().readLine('Press key');
     
+    await copyDirectory(realpathSync(packagePath), packagePath);
+
+    console.log(tmpRepo.tmpRepoName, tmpRepo.tmpRepoPackagePath);
     const git = (...args: string[]) => 
       spawnCommand(packageManager, 'git', args, {
-        cwd: tmpRepo.tmpRepoPackagePath
+        cwd: tmpRepo.tmpRepoName
       });
     
+    removeDirectory(packageManager, join(tmpRepo.tmpRepoPackagePath, 'node_modules'));
+    removeDirectory(packageManager, join(tmpRepo.tmpRepoPackagePath, '.git'));
+
+    writeFileSync(join(tmpRepo.tmpRepoName, '.gitignore'), '!/node_modules\n\n');
+    git('init');
+    git('config', '--local', 'user.name', 'patch-package');
+    git('config', '--local', 'user.email', 'patch@pack.age');
+
     // TODO: remove ignored files (tmpRepo.tmpRepoName, includePaths, excludePaths) // ON THIS LINE
 
-    git("add", "-f", packageDetails.path)
-    git("commit", "--allow-empty", "-m", "init")
+    git('add', '-f', packageDetails.path);
+    git('commit', '--allow-empty', '-m', 'init');
 
     removeDirectory(packageManager, tmpRepo.tmpRepoPackagePath);
 
     copyDirectory(realpathSync(packagePath), tmpRepo.tmpRepoPackagePath);
 
-    removeDirectory(packageManager, join(tmpRepo.tmpRepoPackagePath, "node_modules"));
-    removeDirectory(packageManager, join(tmpRepo.tmpRepoPackagePath, ".git"));
+    removeDirectory(packageManager, join(tmpRepo.tmpRepoPackagePath, 'node_modules'));
+    removeDirectory(packageManager, join(tmpRepo.tmpRepoPackagePath, '.git'));
 
     // TODO: remove ignored files (tmpRepo.tmpRepoName, includePaths, excludePaths) // ON THIS LINE
 
     // stage all files
-    git("add", "-f", packagePath + '-for-patch')
+    git('add', '-f', packageDetails.path);
 
     // get diff of changes
     const diffResult = (await git(
-      "diff",
-      "--cached",
-      "--no-color",
-      "--ignore-space-at-eol",
-      "--no-ext-diff",
-    ))?.replaceAll('-for-patch', '');
+      'diff',
+      '--cached',
+      '--no-color',
+      '--ignore-space-at-eol',
+      '--no-ext-diff',
+    ));
 
-    removeDirectory(packageManager, resolve(forPatchPath));
-    removeDirectory(packageManager, tmpRepo.tmpRepoNpmRoot);
+    if (packageManager === 'bun') removeDirectory(packageManager, resolve(`${getUserHome()}/.bun/install/cache/${packageDetails.name}@${tmpRepo.packageVersion}/`));
 
     if (diffResult.length === 0) {
       console.warn(
@@ -89,7 +90,7 @@ export default async(packagePathSpecifier: string,
 
     for (const patchFile of getPatchFiles(patchesDir)) {
       unlinkSync(`${patchesDir}/${patchFile}`);
-    };
+    }
 
     const patchFileName = createPatchFileName({
       packageDetails,
@@ -102,8 +103,8 @@ export default async(packagePathSpecifier: string,
     writeFileSync(patchPath, diffResult);
     console.log(
       `${green}🚀 Created patch in ${join(patchesDir, patchFileName)}${reset}\n`,
-    )
-}
+    );
+};
 
 function createPatchFileName({
   packageDetails,
@@ -113,8 +114,8 @@ function createPatchFileName({
   packageVersion: string
 }) {
   const packageNames = packageDetails.packageNames
-    .map((name) => name.replace(/\//g, "+"))
-    .join("++")
+    .map((name) => name.replace(/\//g, '+'))
+    .join('++');
 
-  return `${packageNames}+${packageVersion}.patch`
+  return `${packageNames}+${packageVersion}.patch`;
 }

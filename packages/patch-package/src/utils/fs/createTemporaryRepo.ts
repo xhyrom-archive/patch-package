@@ -1,9 +1,8 @@
-import { chmodSync, mkdirSync, writeFileSync } from "fs"
-import { join, resolve } from "path"
-import getPackageVersion from "../package/getPackageVersion"
-import { PackageDetails } from "../package/packageDetails"
-import parseFlag from "../parseFlag"
-import { randomString } from "../random/randomString"
+import { chmodSync, mkdirSync, writeFileSync } from 'fs';
+import { join, resolve } from 'path';
+import getPackageVersion from '../package/getPackageVersion';
+import { PackageDetails } from '../package/packageDetails';
+import { randomString } from '../random/randomString';
 
 export default (packageDetails: PackageDetails): {
   tmpRepoName: string,
@@ -19,7 +18,7 @@ export default (packageDetails: PackageDetails): {
     -`/node_modules/${packageDetails.name}`.length,
   );
 
-  const tmpRepoPackageJsonPath = join(tmpRepoNpmRoot, "package.json");
+  const tmpRepoPackageJsonPath = join(tmpRepoNpmRoot, 'package.json');
   const version = getPackageVersion(join(resolve(packageDetails.path, 'package.json')));
 
   mkdirSync(tmpRepoNpmRoot);
@@ -34,5 +33,5 @@ export default (packageDetails: PackageDetails): {
 
   return {
     tmpRepoName, tmpRepoPackagePath, tmpRepoNpmRoot, tmpRepoPackageJsonPath, packageVersion: version
-  }
-}
+  };
+};

@@ -1,6 +1,7 @@
-import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from "fs";
-import { dirname } from "path";
-import { ParsedPatchFile, FilePatch, Hunk } from "./parse";
+/* eslint-disable */
+import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'fs';
+import { dirname } from 'path';
+import { ParsedPatchFile, FilePatch, Hunk } from './parse';
 
 export const executeEffects = (
   effects: ParsedPatchFile,
@@ -8,75 +9,75 @@ export const executeEffects = (
 ) => {
   effects.forEach(eff => {
     switch (eff.type) {
-      case "file deletion":
+      case 'file deletion':
         if (dryRun) {
           if (!existsSync(eff.path)) {
             throw new Error(
-              "Trying to delete file that doesn't exist: " + eff.path,
-            )
+              'Trying to delete file that doesn\'t exist: ' + eff.path,
+            );
           }
         } else {
           // TODO: integrity checks
-          unlinkSync(eff.path)
+          unlinkSync(eff.path);
         }
-        break
-      case "rename":
+        break;
+      case 'rename':
         if (dryRun) {
           // TODO: see what patch files look like if moving to exising path
           if (!existsSync(eff.fromPath)) {
             throw new Error(
-              "Trying to move file that doesn't exist: " + eff.fromPath,
-            )
+              'Trying to move file that doesn\'t exist: ' + eff.fromPath,
+            );
           }
         } else {
-          renameSync(eff.fromPath, eff.toPath)
+          renameSync(eff.fromPath, eff.toPath);
         }
-        break
-      case "file creation":
+        break;
+      case 'file creation':
         if (dryRun) {
           if (existsSync(eff.path)) {
             throw new Error(
-              "Trying to create file that already exists: " + eff.path,
-            )
+              'Trying to create file that already exists: ' + eff.path,
+            );
           }
           // todo: check file contents matches
         } else {
           const fileContents = eff.hunk
-            ? eff.hunk.parts[0].lines.join("\n") +
-              (eff.hunk.parts[0].noNewlineAtEndOfFile ? "" : "\n")
-            : ""
-          if (!existsSync(dirname(eff.path))) mkdirSync(dirname(eff.path))
-          writeFileSync(eff.path, fileContents) // remove { mode } for now
+            ? eff.hunk.parts[0].lines.join('\n') +
+              (eff.hunk.parts[0].noNewlineAtEndOfFile ? '' : '\n')
+            : '';
+          if (!existsSync(dirname(eff.path))) mkdirSync(dirname(eff.path));
+          writeFileSync(eff.path, fileContents); // remove { mode } for now
         }
-        break
-      case "patch":
-        applyPatch(eff, { dryRun })
-        break
-      case "mode change":
-        const currentMode = statSync(eff.path).mode
+        break;
+      case 'patch':
+        applyPatch(eff, { dryRun });
+        break;
+      case 'mode change':
+        const currentMode = statSync(eff.path).mode;
         if (
           ((isExecutable(eff.newMode) && isExecutable(currentMode)) ||
             (!isExecutable(eff.newMode) && !isExecutable(currentMode))) &&
           dryRun
         ) {
-          console.warn(`Mode change is not required for file ${eff.path}`)
+          console.warn(`Mode change is not required for file ${eff.path}`);
         }
-        chmodSync(eff.path, eff.newMode)
-        break
+        chmodSync(eff.path, eff.newMode);
+        break;
       default:
         return;
     }
-  })
-}
+  });
+};
 
 function isExecutable(fileMode: number) {
   // tslint:disable-next-line:no-bitwise
-  return (fileMode & 0b001_000_000) > 0
+  return (fileMode & 0b001_000_000) > 0;
 }
 
-const trimRight = (s: string) => s.replace(/\s+$/, "")
+const trimRight = (s: string) => s.replace(/\s+$/, '');
 function linesAreEqual(a: string, b: string) {
-  return trimRight(a) === trimRight(b)
+  return trimRight(a) === trimRight(b);
 }
 
 /**
@@ -106,75 +107,77 @@ function applyPatch(
   { dryRun }: { dryRun: boolean },
 ): void {
   // modifying the file in place
-  const fileContents = readFileSync(path, { encoding: 'utf-8', flag: 'r' }).toString()
-  const mode = statSync(path).mode
+  const fileContents = readFileSync(path, { encoding: 'utf-8', flag: 'r' }).toString();
+  //const mode = statSync(path).mode;
 
-  const fileLines: string[] = fileContents.split(/\n/)
+  const fileLines: string[] = fileContents.split(/\n/);
 
-  const result: Modificaiton[][] = []
+  const result: Modificaiton[][] = [];
 
   for (const hunk of hunks) {
-    let fuzzingOffset = 0
+    let fuzzingOffset = 0;
     while (true) {
-      const modifications = evaluateHunk(hunk, fileLines, fuzzingOffset)
+      const modifications = evaluateHunk(hunk, fileLines, fuzzingOffset);
       if (modifications) {
-        result.push(modifications)
-        break
+        result.push(modifications);
+        break;
       }
 
       fuzzingOffset =
-        fuzzingOffset < 0 ? fuzzingOffset * -1 : fuzzingOffset * -1 - 1
+        fuzzingOffset < 0 ? fuzzingOffset * -1 : fuzzingOffset * -1 - 1;
 
       if (Math.abs(fuzzingOffset) > 20) {
         throw new Error(
           `Cant apply hunk ${hunks.indexOf(hunk)} for file ${path}`,
-        )
+        );
+        // idk how to resolve it but it works so
+        //return;
       }
     }
   }
 
   if (dryRun) {
-    return
+    return;
   }
 
-  let diffOffset = 0
+  let diffOffset = 0;
 
   for (const modifications of result) {
     for (const modification of modifications) {
       switch (modification.type) {
-        case "splice":
+        case 'splice':
           fileLines.splice(
             modification.index + diffOffset,
             modification.numToDelete,
             ...modification.linesToInsert,
-          )
+          );
           diffOffset +=
-            modification.linesToInsert.length - modification.numToDelete
-          break
-        case "pop":
-          fileLines.pop()
-          break
-        case "push":
-          fileLines.push(modification.line)
-          break
+            modification.linesToInsert.length - modification.numToDelete;
+          break;
+        case 'pop':
+          fileLines.pop();
+          break;
+        case 'push':
+          fileLines.push(modification.line);
+          break;
         default:
           return;
       }
     }
   }
 
-  writeFileSync(path, fileLines.join("\n")) // remove { mode } for now
+  writeFileSync(path, fileLines.join('\n')); // remove { mode } for now
 }
 
 interface Push {
-  type: "push"
+  type: 'push'
   line: string
 }
 interface Pop {
-  type: "pop"
+  type: 'pop'
 }
 interface Splice {
-  type: "splice"
+  type: 'splice'
   index: number
   numToDelete: number
   linesToInsert: string[]
@@ -187,59 +190,59 @@ function evaluateHunk(
   fileLines: string[],
   fuzzingOffset: number,
 ): Modificaiton[] | null {
-  const result: Modificaiton[] = []
-  let contextIndex = hunk.header.original.start - 1 + fuzzingOffset
+  const result: Modificaiton[] = [];
+  let contextIndex = hunk.header.original.start - 1 + fuzzingOffset;
   // do bounds checks for index
   if (contextIndex < 0) {
-    return null
+    return null;
   }
   if (fileLines.length - contextIndex < hunk.header.original.length) {
-    return null
+    return null;
   }
 
   for (const part of hunk.parts) {
     switch (part.type) {
-      case "deletion":
-      case "context":
+      case 'deletion':
+      case 'context':
         for (const line of part.lines) {
-          const originalLine = fileLines[contextIndex]
+          const originalLine = fileLines[contextIndex];
           if (!linesAreEqual(originalLine, line)) {
-            return null
+            return null;
           }
-          contextIndex++
+          contextIndex++;
         }
 
-        if (part.type === "deletion") {
+        if (part.type === 'deletion') {
           result.push({
-            type: "splice",
+            type: 'splice',
             index: contextIndex - part.lines.length,
             numToDelete: part.lines.length,
             linesToInsert: [],
-          })
+          });
 
           if (part.noNewlineAtEndOfFile) {
             result.push({
-              type: "push",
-              line: "",
-            })
+              type: 'push',
+              line: '',
+            });
           }
         }
-        break
-      case "insertion":
+        break;
+      case 'insertion':
         result.push({
-          type: "splice",
+          type: 'splice',
           index: contextIndex,
           numToDelete: 0,
           linesToInsert: part.lines,
-        })
+        });
         if (part.noNewlineAtEndOfFile) {
-          result.push({ type: "pop" })
+          result.push({ type: 'pop' });
         }
-        break
+        break;
       default:
         return;
     }
   }
 
-  return result
+  return result;
 }

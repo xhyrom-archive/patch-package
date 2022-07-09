@@ -7,4 +7,4 @@ export default (packageManager: string, removeDirectory: string) => {
     }
 
     return rmSync(removeDirectory, { recursive: true, force: true });
-}
+};

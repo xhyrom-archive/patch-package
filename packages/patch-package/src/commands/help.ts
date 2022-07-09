@@ -1,15 +1,15 @@
-const bold = (text) => `\u001b[1m${text}\u001b[0m`;
-const underline = (text) => `\u001b[4m[1m${text}\u001b[0m`;
+const bold = text => `\u001b[1m${text}\u001b[0m`;
+const underline = text => `\u001b[4m[1m${text}\u001b[0m`;
 
 export default () => {
-    console.log(`
+	console.log(`
     Usage:
       1. Patching packages
       ====================
         ${bold('patch-package')}
       Without arguments, the ${bold(
-        'patch-package',
-      )} command will attempt to find and apply
+				'patch-package',
+			)} command will attempt to find and apply
       patch files to your project. It looks for files named like
          ./patches/<package-name>+<version>.patch
       Options:
@@ -39,9 +39,7 @@ export default () => {
           
       2. Creating patch files
       =======================
-        ${bold('patch-package')} <package-name>${underline(
-        '[ <package-name>]',
-      )}
+        ${bold('patch-package')} <package-name>${underline('[ <package-name>]')}
       When given package names as arguments, patch-package will create patch files
       based on any changes you've made to the versions installed by yarn/npm.
       Options:
@@ -68,4 +66,4 @@ export default () => {
         ${bold('--patch-dir')}
             Specify the name for the directory in which to put the patch files.
     `);
-}
+};

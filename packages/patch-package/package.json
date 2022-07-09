@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "author": "",
   "main": "dist/index.js",
+  "bin": {
+    "@xhyrom-patch-package": "./dist/index.js"
+  },
   "devDependencies": {
     "@types/diff": "^5.0.2",
     "@types/node": "^18.0.3",

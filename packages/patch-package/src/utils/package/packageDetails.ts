@@ -23,50 +23,50 @@ const parseNameAndVersion = (
   name: string
   version?: string
 } | null => {
-  const parts = s.split("+")
+  const parts = s.split('+');
   switch (parts.length) {
     case 1: {
-      return { name: parts[0] }
+      return { name: parts[0] };
     }
     case 2: {
-      const [nameOrScope, versionOrName] = parts
+      const [nameOrScope, versionOrName] = parts;
       if (versionOrName.match(/^\d+/)) {
         return {
           name: nameOrScope,
           version: versionOrName,
-        }
+        };
       }
-      return { name: `${nameOrScope}/${versionOrName}` }
+      return { name: `${nameOrScope}/${versionOrName}` };
     }
     case 3: {
-      const [scope, name, version] = parts
-      return { name: `${scope}/${name}`, version }
+      const [scope, name, version] = parts;
+      return { name: `${scope}/${name}`, version };
     }
   }
-  return null
-}
+  return null;
+};
 
 export const getPatchDetailsFromCliString =(
     specifier: string,
   ): PackageDetails | null => {
-    const parts = specifier.split('/')
+    const parts = specifier.split('/');
   
-    const packageNames = []
+    const packageNames = [];
   
-    let scope: string | null = null
+    let scope: string | null = null;
   
     for (let i = 0; i < parts.length; i++) {
       if (parts[i].startsWith('@')) {
         if (scope) {
-          return null
+          return null;
         }
-        scope = parts[i]
+        scope = parts[i];
       } else {
         if (scope) {
-          packageNames.push(`${scope}/${parts[i]}`)
-          scope = null
+          packageNames.push(`${scope}/${parts[i]}`);
+          scope = null;
         } else {
-          packageNames.push(parts[i])
+          packageNames.push(parts[i]);
         }
       }
     }
@@ -81,61 +81,61 @@ export const getPatchDetailsFromCliString =(
       humanReadablePathSpecifier: packageNames.join(' => '),
       isNested: packageNames.length > 1,
       pathSpecifier: specifier,
-    }
-}
+    };
+};
 
 export function getPackageDetailsFromPatchFilename(
   patchFilename: string,
 ): PatchedPackageDetails | null {
   const legacyMatch = patchFilename.match(
     /^([^+=]+?)(:|\+)(\d+\.\d+\.\d+.*?)(\.dev)?\.patch$/,
-  )
+  );
 
   if (legacyMatch) {
-    const name = legacyMatch[1]
-    const version = legacyMatch[3]
+    const name = legacyMatch[1];
+    const version = legacyMatch[3];
 
     return {
       packageNames: [name],
       pathSpecifier: name,
       humanReadablePathSpecifier: name,
-      path: join("node_modules", name),
+      path: join('node_modules', name),
       name,
       version,
       isNested: false,
       patchFilename,
-      isDevOnly: patchFilename.endsWith(".dev.patch"),
-    }
+      isDevOnly: patchFilename.endsWith('.dev.patch'),
+    };
   }
 
   const parts = patchFilename
-    .replace(/(\.dev)?\.patch$/, "")
-    .split("++")
+    .replace(/(\.dev)?\.patch$/, '')
+    .split('++')
     .map(parseNameAndVersion)
-    .filter((x): x is NonNullable<typeof x> => x !== null)
+    .filter((x): x is NonNullable<typeof x> => x !== null);
 
   if (parts.length === 0) {
-    return null
+    return null;
   }
 
-  const lastPart = parts[parts.length - 1]
+  const lastPart = parts[parts.length - 1];
 
   if (!lastPart.version) {
-    return null
+    return null;
   }
 
   return {
     name: lastPart.name,
     version: lastPart.version,
     path: join(
-      "node_modules",
-      parts.map(({ name }) => name).join("/node_modules/"),
+      'node_modules',
+      parts.map(({ name }) => name).join('/node_modules/'),
     ),
     patchFilename,
-    pathSpecifier: parts.map(({ name }) => name).join("/"),
-    humanReadablePathSpecifier: parts.map(({ name }) => name).join(" => "),
+    pathSpecifier: parts.map(({ name }) => name).join('/'),
+    humanReadablePathSpecifier: parts.map(({ name }) => name).join(' => '),
     isNested: parts.length > 1,
     packageNames: parts.map(({ name }) => name),
-    isDevOnly: patchFilename.endsWith(".dev.patch"),
-  }
+    isDevOnly: patchFilename.endsWith('.dev.patch'),
+  };
 }

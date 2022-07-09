@@ -1,6 +1,6 @@
-import { PackageManagers } from "../detectPackageManager"
-import { PackageDetails } from "../package/packageDetails"
-import spawnCommand from "../spawnCommand";
+import { PackageManagers } from '../detectPackageManager';
+import { PackageDetails } from '../package/packageDetails';
+import spawnCommand from '../spawnCommand';
 
 export default async(packageManager: PackageManagers, packageDetails: PackageDetails, packageVersion: string, tmpRepoNpmRoot: string) => {
     console.log(`Installing ${packageDetails.name}@${packageVersion} with ${packageManager}`);
@@ -13,7 +13,7 @@ export default async(packageManager: PackageManagers, packageDetails: PackageDet
                 packageManager,
                 packageManager,
                 [
-                  'add', packageDetails.name
+                  'add', `${packageDetails.name}@${packageVersion}`
                 ],
                 {
                   cwd: tmpRepoNpmRoot
@@ -26,7 +26,7 @@ export default async(packageManager: PackageManagers, packageDetails: PackageDet
                 packageManager,
                 packageManager,
                 [
-                    'i', packageDetails.name
+                    'i', `${packageDetails.name}@${packageVersion}`
                 ],
                 {
                     cwd: tmpRepoNpmRoot
@@ -37,4 +37,4 @@ export default async(packageManager: PackageManagers, packageDetails: PackageDet
     }
 
     console.log(`${packageDetails.name}@${packageVersion} has been installed with ${packageManager}`);
-}
+};
