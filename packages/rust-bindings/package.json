@@ -22,10 +22,5 @@
     "prepublishOnly": "napi prepublish -t npm",
     "test": "ava",
     "version": "napi version"
-  },
-  "optionalDependencies": {
-    "@xhyrom/patch-package-bindings-win32-x64-msvc": "0.0.0",
-    "@xhyrom/patch-package-bindings-darwin-x64": "0.0.0",
-    "@xhyrom/patch-package-bindings-linux-x64-gnu": "0.0.0"
   }
 }
