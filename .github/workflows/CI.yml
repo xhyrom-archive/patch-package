@@ -6,7 +6,7 @@ env:
 'on':
   push:
     branches:
-      - master
+      - rust-bindings
     tags-ignore:
       - '**'
     paths-ignore:
@@ -16,9 +16,6 @@ env:
       - .editorconfig
       - docs/**
   pull_request: null
-defaults:
-  run:
-    working-directory: ./packages/rust-bindings
 jobs:
   build:
     if: '!contains(github.event.head_commit.message, ''skip ci'')'
@@ -29,7 +26,6 @@ jobs:
           - host: macos-latest
             target: x86_64-apple-darwin
             build: |
-              cd ./packages/rust-bindings
               yarn build
               strip -x *.node
           - host: windows-latest
@@ -39,7 +35,6 @@ jobs:
             target: x86_64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
             build: |-
-              cd ./packages/rust-bindings
               set -e &&
               yarn build --target x86_64-unknown-linux-gnu &&
               strip *.node
@@ -54,7 +49,6 @@ jobs:
           node-version: 16
           check-latest: true
           cache: yarn
-          cache-dependency-path: ./packages/rust-bindings
       - name: Install
         uses: actions-rs/toolchain@v1
         if: ${{ !matrix.settings.docker }}
@@ -98,7 +92,6 @@ jobs:
           check-latest: true
           cache: yarn
           architecture: x86
-          cache-dependency-path: ./packages/rust-bindings
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
@@ -139,7 +132,6 @@ jobs:
           node-version: ${{ matrix.node }}
           check-latest: true
           cache: yarn
-          cache-dependency-path: ./packages/rust-bindings
       - name: Cache NPM dependencies
         uses: actions/cache@v3
         with:
@@ -177,7 +169,6 @@ jobs:
           node-version: ${{ matrix.node }}
           check-latest: true
           cache: yarn
-          cache-dependency-path: ./packages/rust-bindings
       - name: Cache NPM dependencies
         uses: actions/cache@v3
         with:
@@ -209,7 +200,6 @@ jobs:
           node-version: 16
           check-latest: true
           cache: yarn
-          cache-dependency-path: ./packages/rust-bindings
       - name: Cache NPM dependencies
         uses: actions/cache@v3
         with:

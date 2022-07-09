@@ -11,7 +11,7 @@
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
     "format": "npx prettier --write packages/patch-package/src/**/*.ts",
-    "build": "npx babel --extensions .ts ./packages/patch-package/src -d ./packages/patch-package/dist --copy-files"
+    "build": "npx babel --extensions .ts ./packages/patch-package/src -d ./packages/patch-package/dist --copy-files && npx copyfiles README.md packages/patch-package"
   },
   "workspaces": [
     "packages/rust-bindings",
@@ -34,6 +34,7 @@
     "@babel/preset-typescript": "^7.18.6",
     "@octokit/action": "^4.0.4",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
-    "babel-plugin-add-import-extension": "^1.6.0"
+    "babel-plugin-add-import-extension": "^1.6.0",
+    "copyfiles": "^2.4.1"
   }
 }

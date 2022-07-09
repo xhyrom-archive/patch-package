@@ -47,7 +47,7 @@ jobs:
 
       - name: Publish releases
         run: |
-          npm ci
+          /home/runner/.bun/bin/bun install
           node ./scripts/create-release.mjs ${{ github.event.inputs.name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
