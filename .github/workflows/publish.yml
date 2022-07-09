@@ -21,11 +21,7 @@ jobs:
           curl https://bun.sh/install | bash
 
       - name: Add bun to Path
-        run: |
-          echo "/home/runner/.bun" >> $GITHUB_PATH;
-          echo BUN_INSTALL="/home/runner/.bun" >> $HOME/.bashrc
-          echo PATH="$BUN_INSTALL/bin:$PATH" >> $HOME/.bashrc
-          source $HOME/.bashrc
+        run: echo "/home/runner/.bun/bin" >> $GITHUB_PATH;
 
       - name: Set Github Actions bot
         run: |
@@ -39,11 +35,11 @@ jobs:
           echo ::set-output name=version::$variable
       - name: Publish a NPM package
         run: |
-          bun install
+          /home/runner/.bun/bin/bun install
           cd packages/patch-package
-          bun install
+          /home/runner/.bun/bin/bun install
           cd ../..
-          bun run build
+          /home/runner/.bun/bin/bun run build
           cd packages/patch-package
           npm publish --access public
         env:
