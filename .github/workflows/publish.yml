@@ -19,6 +19,8 @@ jobs:
       - name: Install bun
         run: |
           curl https://bun.sh/install | bash
+          echo BUN_INSTALL="/home/runner/.bun" >> $GITHUB_ENV;
+          echo PATH="$BUN_INSTALL/bin:$PATH" >> $GITHUB_ENV;
 
       - name: Set Github Actions bot
         run: |
