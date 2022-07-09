@@ -1,0 +1,4 @@
+[submodule "packages/rust-bindings"]
+	path = packages/rust-bindings
+	url = https://github.com/xHyroM/patch-package.git
+	branch = rust-bindings
