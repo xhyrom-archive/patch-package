@@ -16,6 +16,7 @@ vim node_modules/some-package/brokenFile.js
 
 # start patch-package
 npx @xhyrom-patch-package some-package
+# with bun: bun node_modules/@xhyrom/patch-package some-package
 ```
 
 ## Setup
@@ -25,3 +26,6 @@ npx @xhyrom-patch-package some-package
 +    "postinstall": "@xhyrom-patch-package"
 }
 ```
+
+### With bun:
+You need run `bun node_modules/@xhyrom/patch-package` after every `bun add some-package`

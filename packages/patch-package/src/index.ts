@@ -35,7 +35,6 @@ const applicationPath = process.cwd();
             
             for (const packageName of packageNames) {
                 await makePatch(packageName, applicationPath, packageManager, includePaths, excludePaths, patchesDir);
-                await applyPatches(packageManager, patchesDir, applicationPath);
             }
         } else {
             applyPatches(packageManager, patchesDir, applicationPath);
