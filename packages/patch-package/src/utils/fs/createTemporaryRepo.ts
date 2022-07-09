@@ -6,7 +6,7 @@ import { randomString } from '../random/randomString';
 
 export default (packageDetails: PackageDetails): {
   tmpRepoName: string,
-  tmpRepoPackagePath: string;
+  tmpRepoPackagePath: string,
   tmpRepoNpmRoot: string,
   tmpRepoPackageJsonPath: string;
   packageVersion: string;

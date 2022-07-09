@@ -39,7 +39,6 @@ export default async(packageManager: PackageManagers,
         } = packageDetails;
     
         const packageDir = join(applicationPath, path);
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const installedPackage = require(join(packageDir, 'package.json'));
 
         if (

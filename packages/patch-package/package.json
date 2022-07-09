@@ -1,7 +1,7 @@
 {
   "name": "@xhyrom/patch-package",
   "version": "0.1.0",
-  "author": "",
+  "author": "Fix broken node modules with no fuss",
   "main": "dist/index.js",
   "bin": {
     "@xhyrom-patch-package": "./dist/index.js"
@@ -13,9 +13,5 @@
   },
   "description": "",
   "keywords": [],
-  "license": "ISC",
-  "scripts": {
-    "dev": "bun src/index.ts",
-    "build": "bun bun src/"
-  }
+  "license": "MIT"
 }
